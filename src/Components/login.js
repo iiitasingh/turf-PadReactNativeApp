@@ -28,7 +28,7 @@ class LoginScreen extends Component {
                 password: password
             }
 
-            const url = `https://turf-pad.herokuapp.com/user/${username}`;
+            const url = `https://turfpadwebservices.azurewebsites.net/user/${username}`;
             this.setState({ loading: true });
 
             fetch(url, {

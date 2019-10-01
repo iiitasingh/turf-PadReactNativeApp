@@ -3,10 +3,6 @@ import { View, Text, FlatList, ActivityIndicator, AsyncStorage } from "react-nat
 import { ListItem, SearchBar } from "react-native-elements";
 import MyHeader from "./MyHeader";
 
-var gpn;
-AsyncStorage.getItem('user').then((value) => {
-    gpn = value;
-})
 
 class YourTurfBookings extends React.Component {
 
@@ -16,7 +12,8 @@ class YourTurfBookings extends React.Component {
             loading: false,
             data: [],
             search: '',
-            refreshing: false
+            refreshing: false,
+            gpn: ''
         };
     }
     renderSeparator = () => {
@@ -41,7 +38,7 @@ class YourTurfBookings extends React.Component {
     }
 
     makeRemoteRequest = () => {
-        const url = `https://turf-pad.herokuapp.com/turfdata/all/${gpn}`;
+        const url = `https://turfpadwebservices.azurewebsites.net/turfdata/all/${this.state.gpn}`;
         this.setState({ loading: true });
 
         fetch(url)
@@ -83,7 +80,12 @@ class YourTurfBookings extends React.Component {
     };
 
     componentDidMount() {
-        this.makeRemoteRequest();
+
+        AsyncStorage.getItem('user').then((value) => {
+            this.setState({ gpn: value }, () => {
+                this.makeRemoteRequest();
+            });
+        })
     }
 
     render() {

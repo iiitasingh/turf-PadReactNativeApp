@@ -22,16 +22,6 @@ let timeSlots = [
     { value: '6pm-7pm' }
 ];
 
-let Status = [
-    { value: 'Confirmed' },
-    { value: 'Tentative' }
-];
-
-var gpn;
-AsyncStorage.getItem('user').then((value) => {
-    gpn = value;
-})
-
 
 class TurfBooking extends React.Component {
 
@@ -44,6 +34,7 @@ class TurfBooking extends React.Component {
         selectedSlot: '',
         status: 'Confirmed',
         search: '',
+        gpn: '',
         refreshing: false,
     }
 
@@ -57,7 +48,7 @@ class TurfBooking extends React.Component {
             date: moment(date).format('DD-MM-YYYY')
         });
 
-        const url = `https://turf-pad.herokuapp.com/turfdata/${this.state.date}`;
+        const url = `https://turfpadwebservices.azurewebsites.net/turfdata/${this.state.date}`;
         this.setState({ loading: true });
 
         fetch(url, { method: 'get' })
@@ -97,12 +88,12 @@ class TurfBooking extends React.Component {
     onSubmit = (props) => {
         if (this.state.selectedSlot.length >= 1) {
             const Postdata = {
-                gpn: gpn,
+                gpn: this.state.gpn,
                 date: this.state.date,
                 value: this.state.selectedSlot,
                 status: this.state.status
             };
-            const url = `https://turf-pad.herokuapp.com/turfdata`;
+            const url = `https://turfpadwebservices.azurewebsites.net/turfdata`;
             this.setState({ loading: true });
             fetch(url, {
                 method: 'post',
@@ -144,7 +135,12 @@ class TurfBooking extends React.Component {
     }
 
     componentDidMount() {
-        const url = `https://turf-pad.herokuapp.com/turfdata/${this.state.date}`;
+
+        AsyncStorage.getItem('user').then((value) => {
+            this.setState({ gpn: value });
+        })
+
+        const url = `https://turfpadwebservices.azurewebsites.net/turfdata/${this.state.date}`;
         this.setState({ loading: true });
 
         fetch(url, { method: 'get' })
@@ -172,6 +168,7 @@ class TurfBooking extends React.Component {
                 this.setState({ error, loading: false });
                 console.log(error);
             });
+
     };
 
     render() {
@@ -182,13 +179,6 @@ class TurfBooking extends React.Component {
                     (this.state.loading) ?
                         <View style={{ paddingVertical: 20, borderTopWidth: 1, borderColor: "#CED0CE" }}><ActivityIndicator animating size="small" /></View> : <ScrollView style={styles.scrollPage}>
                             <View>
-                                {/* <TextField
-                                    label='Select Date'
-                                    value={this.state.date}
-                                    onChangeText={(phone) => this.setState({ date: phone })}
-                                    onFocus={() => this.showPicker()}
-
-                                /> */}
                                 <Button buttonStyle={styles.TurfButton}
                                     onPress={() => this.showPicker()}
                                     title={this.state.date} />
@@ -205,12 +195,6 @@ class TurfBooking extends React.Component {
                                 label='Select Slot'
                                 data={this.state.result}
                                 onChangeText={(value) => this.setState({ selectedSlot: value })}
-                            />
-                            <Dropdown
-                                label='Status'
-                                data={Status}
-                                value={this.state.status}
-                                onChangeText={(value) => this.setState({ status: value })}
                             />
                             <Button buttonStyle={styles.TurfButton}
                                 onPress={(props) => this.onSubmit(props)}

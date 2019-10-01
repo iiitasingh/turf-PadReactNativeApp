@@ -17,10 +17,6 @@ let data = [{
     value: 'Glue',
 }];
 
-var gpn;
-AsyncStorage.getItem('user').then((value) => {
-    gpn = value;
-})
 
 
 class StationaryBooking extends React.Component {
@@ -29,7 +25,8 @@ class StationaryBooking extends React.Component {
         this.state = {
             type: '',
             error: null,
-            loading: false
+            loading: false,
+            gpn: ''
         }
     }
 
@@ -37,11 +34,11 @@ class StationaryBooking extends React.Component {
     onSubmit = (props) => {
         if (this.state.type.length >= 1) {
             const Postdata = {
-                gpn: gpn,
+                gpn: this.state.gpn,
                 type: this.state.type,
                 status: 'Pending'
             };
-            const url = `https://turf-pad.herokuapp.com/stationary`;
+            const url = `https://turfpadwebservices.azurewebsites.net/stationary`;
             this.setState({ loading: true });
             fetch(url, {
                 method: 'post',
@@ -79,6 +76,13 @@ class StationaryBooking extends React.Component {
                 ToastAndroid.CENTER,
             );
         }
+    }
+
+    componentDidMount() {
+        AsyncStorage.getItem('user').then((value) => {
+            this.setState({ gpn: value });
+        })
+
     }
     render() {
         return (
